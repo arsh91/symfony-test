@@ -1,0 +1,64 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Fruits List{% endblock %}
+
+{% block content %}
+    <div id="wrap">
+			<div class="container">
+            <h3 class="mb-4">A demo of Listing all the Fruits</h3>
+
+                <form method="post" action="" name="search_filter">
+                        <div class="form-group">
+                            <select name="by_name_filter" class="form-control select_filter" id="by_name">
+                                <option value="all" selected="selected">By Name</option>
+                                {% for fruit in fruits %}
+                                    <option value="{{ fruit.name }}">{{ fruit.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <select name="by_family_filter" class="form-control select_filter" id="by_family">
+                                <option value="all">By Family</option>
+                                {% for fruit in fruits %}
+                                    <option value="{{ fruit.family }}">{{ fruit.family }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </form>
+				<table cellpadding="0" cellspacing="0" border="0" class="fruits_list_table table table-striped table-bordered" id="fruits_list_table">
+					<thead>
+						<tr>
+							<th>Id</th>
+							<th>Name</th>
+							<th>Family</th>
+							<th>Order</th>
+							<th>Calories</th>
+							<th>Fat</th>
+							<th>Sugar</th>
+							<th>Carbohydrates</th>
+							<th>Protein</th>
+						</tr>
+					</thead>
+					<tbody>
+                    {% for fruit in fruits %}
+                        <tr class="gradeX">
+							<td>{{ fruit.id }}</td>
+							<td>{{ fruit.name }}</td>
+							<td>{{ fruit.family }}</td>
+							<td>{{ fruit.order }}</td>
+							<td>{{ fruit.calories }}</td>
+							<td>{{ fruit.fat }}</td>
+							<td>{{ fruit.sugar }}</td>
+							<td>{{ fruit.carbohydrates }}</td>
+							<td>{{ fruit.protein }}</td>
+                    {% endfor %}
+
+							
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+
+{% endblock %}
+
