@@ -46,7 +46,6 @@ class FruitController extends AbstractController
         // Get fruits from database
         $repository = $this->em->getRepository(Fruit::class);
         $queryBuilder = $repository->createQueryBuilder('f');
-
         // Apply filters
         if ($name) {
             $queryBuilder->where('f.name LIKE :name')
@@ -82,6 +81,9 @@ class FruitController extends AbstractController
         
         
                 }
+        // Get the total count of fruits
+        $totalFruitsCount = $get_fruits->getTotalItemCount();
+
         // Serialize fruits data
         $data = $this->serializer->serialize($fruits, 'json', [
             'circular_reference_handler' => function ($object) {
@@ -89,7 +91,7 @@ class FruitController extends AbstractController
             }
         ]);
         // dd($data);
-        return new JsonResponse(['fruits' => json_decode($data)], Response::HTTP_OK);
+        return new JsonResponse(['fruits' => json_decode($data), 'totalCount' => $totalFruitsCount], Response::HTTP_OK);
     }
 
     /**
@@ -142,23 +144,34 @@ class FruitController extends AbstractController
     public function addFavoriteFruit(Request $request): JsonResponse
     {
         // Get fruit ID from request payload
-        $fruitId = $request->request->get('fruit_id');
+        $fruitId = $request->query->get('fruit_id');
         // Get fruit data from request payload
         // $fruitData = json_decode($request->getContent(), true);
+        // dd($fruitId);
 
-        // Create a new favorite fruit object and set data
-        $favoriteFruit = new FavouriteFruit();
-        $favoriteFruit->setFruitId($fruitId);
+        // Get favourite fruits from database
+        $repository = $this->em->getRepository(FavouriteFruit::class);
+        $count = $repository->createQueryBuilder('ff')
+            ->select('COUNT(ff.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
 
-        // Save favorite fruit to database
-        // $entityManager = $this->getDoctrine()->getManager();
+        $success = false;
+        if($count < 10){
 
-        $entityManager = $this->doctrine->getManager();
-        $entityManager->persist($favoriteFruit);
-        $entityManager->flush();
+            // Create a new favorite fruit object and set data
+            $favoriteFruit = new FavouriteFruit();
+            $favoriteFruit->setFruitId($fruitId);
+
+            // Save favorite fruit to database
+            $entityManager = $this->doctrine->getManager();
+            $entityManager->persist($favoriteFruit);
+            $entityManager->flush();
+            $success = true;
+        }
 
         // Return success response
-        return new JsonResponse(['success' => true], Response::HTTP_CREATED);
+        return new JsonResponse(['success' => $success], Response::HTTP_CREATED);
     }
 
     /**
